@@ -13,7 +13,7 @@ function App() {
 
   // REGISTER
   const register = async () => {
-    const response = await fetch("https://taskflow-api-siov.onrender.com//register", {
+    const response = await fetch("https://taskflow-api-siov.onrender.com/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -31,7 +31,7 @@ function App() {
 
   // LOGIN
   const login = async () => {
-    const response = await fetch("https://taskflow-api-siov.onrender.com//login", {
+    const response = await fetch("https://taskflow-api-siov.onrender.com/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -53,7 +53,7 @@ function App() {
 
   // OBTENER tareas
   const fetchTasks = async () => {
-    const response = await fetch("https://taskflow-api-siov.onrender.com//tasks", {
+    const response = await fetch("https://taskflow-api-siov.onrender.com/tasks", {
       headers: {
         Authorization: localStorage.getItem("token")
       }
@@ -70,7 +70,7 @@ function App() {
 
   // CREAR tarea
   const createTask = async () => {
-    await fetch("https://taskflow-api-siov.onrender.com//tasks", {
+    await fetch("https://taskflow-api-siov.onrender.com/tasks", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -90,7 +90,7 @@ function App() {
 
   // BORRAR tarea
   const deleteTask = async (id) => {
-    await fetch(`https://taskflow-api-siov.onrender.com//tasks/${id}`, {
+    await fetch(`https://taskflow-api-siov.onrender.com/tasks/${id}`, {
       method: "DELETE",
       headers: {
         Authorization: localStorage.getItem("token")

@@ -10,9 +10,14 @@ const auth = (req, res, next) => {
   }
 
   const token = authHeader.split(" ")[1]
+  console.log("TOKEN RECIBIDO:")
+  console.log(token)
 
   try {
     const decoded = jwt.verify(token, "secretkey")
+
+    console.log("TOKEN VALIDO")
+    console.log(decoded)
 
     req.userId = decoded.userId
 

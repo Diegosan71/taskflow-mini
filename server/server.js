@@ -90,9 +90,12 @@ app.post("/login", async (req, res) => {
   }
 
   const token = jwt.sign(
-    { userId: user._id },
-    process.env.JWT_SECRET
-  )
+  { userId: user._id },
+  "secretkey",
+  { expiresIn: "7d" }
+)
+
+console.log(token)
 
   res.json({
     message: "Login exitoso",

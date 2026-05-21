@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react"
 import "./index.css"
 
+const API = "https://taskflow-api-siov.onrender.com"
+
 function App() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [message, setMessage] = useState("")
-
   const [tasks, setTasks] = useState([])
   const [title, setTitle] = useState("")
 
@@ -13,89 +14,87 @@ function App() {
 
   // REGISTER
   const register = async () => {
-    const response = await fetch("https://taskflow-api-siov.onrender.com/register", {
+    const res = await fetch(`${API}/register`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        email,
-        password
-      })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password })
     })
 
-    const data = await response.json()
-
+    const data = await res.json()
     setMessage(data.message)
   }
 
   // LOGIN
   const login = async () => {
-    const response = await fetch("https://taskflow-api-siov.onrender.com/login", {
+    const res = await fetch(`${API}/login`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        email,
-        password
-      })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password })
     })
 
-    const data = await response.json()
+    const data = await res.json()
+
+    if (!res.ok || !data.token) {
+      setMessage(data.message || "Error login")
+      return
+    }
 
     localStorage.setItem("token", data.token)
-
-    setMessage(data.message)
-
+    setMessage("Login correcto")
     fetchTasks()
   }
 
-  // OBTENER tareas
+  // GET TASKS
   const fetchTasks = async () => {
-    const response = await fetch("https://taskflow-api-siov.onrender.com/tasks", {
+    const token = localStorage.getItem("token")
+
+    const res = await fetch(`${API}/tasks`, {
       headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("token")}`
-}
+        Authorization: `Bearer ${token}`
+      }
     })
 
-    const data = await response.json()
-
-    console.log(JSON.stringify(data))
+    const data = await res.json()
 
     if (Array.isArray(data)) {
       setTasks(data)
+    } else {
+      console.log("ERROR tasks:", data)
     }
   }
 
-  // CREAR tarea
+  // CREATE TASK
   const createTask = async () => {
-    await fetch("https://taskflow-api-siov.onrender.com/tasks", {
+    const token = localStorage.getItem("token")
+
+    const res = await fetch(`${API}/tasks`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`
+        Authorization: `Bearer ${token}`
       },
-      body: JSON.stringify({
-        title
-      })
+      body: JSON.stringify({ title })
     })
 
+    const data = await res.json()
 
-    console.log("tarea creada")
+    if (!res.ok) {
+      console.log(data.message)
+      return
+    }
 
     setTitle("")
-
     fetchTasks()
   }
 
-  // BORRAR tarea
+  // DELETE TASK
   const deleteTask = async (id) => {
-    await fetch(`https://taskflow-api-siov.onrender.com/tasks/${id}`, {
+    const token = localStorage.getItem("token")
+
+    await fetch(`${API}/tasks/${id}`, {
       method: "DELETE",
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`
+        Authorization: `Bearer ${token}`
       }
     })
 
@@ -103,25 +102,20 @@ function App() {
   }
 
   useEffect(() => {
-    if (token) {
-      fetchTasks()
-    }
+    if (token) fetchTasks()
   }, [])
 
   return (
     <div className="container">
       <h1>TaskFlow Mini</h1>
 
-      {!token && (
+      {!token ? (
         <>
           <input
-            type="email"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
-
-          <br />
 
           <input
             type="password"
@@ -130,48 +124,29 @@ function App() {
             onChange={(e) => setPassword(e.target.value)}
           />
 
-          <br />
+          <button onClick={register}>Register</button>
+          <button onClick={login}>Login</button>
 
-          <button onClick={register}>
-            Register
-          </button>
-
-          <button onClick={login}>
-            Login
-          </button>
-
-          <p className="message">{message}</p>
+          <p>{message}</p>
         </>
-      )}
-
-      {token && (
+      ) : (
         <>
           <h2>Mis tareas</h2>
 
           <input
-            type="text"
             placeholder="Nueva tarea"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
 
-          <button onClick={createTask}>
-            Agregar
-          </button>
+          <button onClick={createTask}>Agregar</button>
 
-          <hr />
+          {tasks.length === 0 && <p>No hay tareas</p>}
 
-          {tasks.length === 0 && (
-            <p>No hay tareas todavía</p>
-          )}
-
-          {tasks.map((task) => (
-            <div className="task" key={task._id}>
-              <p>{task.title}</p>
-
-              <button onClick={() => deleteTask(task._id)}>
-                Borrar
-              </button>
+          {tasks.map((t) => (
+            <div key={t._id} className="task">
+              <p>{t.title}</p>
+              <button onClick={() => deleteTask(t._id)}>Borrar</button>
             </div>
           ))}
         </>

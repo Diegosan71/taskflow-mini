@@ -55,8 +55,9 @@ function App() {
   const fetchTasks = async () => {
     const response = await fetch("https://taskflow-api-siov.onrender.com/tasks", {
       headers: {
-        Authorization: localStorage.getItem("token")
-      }
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+}
     })
 
     const data = await response.json()
@@ -74,12 +75,13 @@ function App() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: localStorage.getItem("token")
+        Authorization: `Bearer ${localStorage.getItem("token")}`
       },
       body: JSON.stringify({
         title
       })
     })
+
 
     console.log("tarea creada")
 
@@ -93,7 +95,7 @@ function App() {
     await fetch(`https://taskflow-api-siov.onrender.com/tasks/${id}`, {
       method: "DELETE",
       headers: {
-        Authorization: localStorage.getItem("token")
+        Authorization: `Bearer ${localStorage.getItem("token")}`
       }
     })
 

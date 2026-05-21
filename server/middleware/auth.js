@@ -18,7 +18,9 @@ const auth = (req, res, next) => {
 
     next()
   } catch (error) {
-    res.json({
+    console.log(error)
+
+    return res.json({
       message: "Token inválido"
     })
   }
